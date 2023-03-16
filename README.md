@@ -96,7 +96,7 @@ When a message is sent to a Headers exchange, the exchange looks at the headers 
 For example, if a message has a header of "color=blue" and there is a queue bound to the Headers exchange with a binding that specifies "x-match=all" and "color=blue", the message will be routed to that queue. However, if the message header does not match any of the bindings, the message will be discarded.
 <br>
 
-![](https://github.com/AnastasKosstow/RabbitMQ/blob/main/assets/header_exchange.png)
+![](https://github.com/AnastasKosstow/RabbitMQ/blob/main/assets/headers_exchange.png)
 <br><br>
 
 

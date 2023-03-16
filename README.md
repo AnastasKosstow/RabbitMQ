@@ -9,6 +9,9 @@ Table of content
 * [Introduction](#introduction)
 * [Exchanges](#exchanges)
   * [Direct exchange](#direct-exchange)
+  * [Fanout exchange](#fanout-exchange)
+  * [Topic exchange](#topic-exchange)
+  * [Header exchange](#header-exchange)
 
 
 Introduction
@@ -29,6 +32,30 @@ In a RabbitMQ centralized architecture, applications or services that need to ex
 > * Topic Exchange: Messages are routed to queues based on a pattern match between the routing key of the message and the binding key of the queue.
 > * Headers Exchange: Messages are routed to queues based on headers attached to the message.
 
+
+<h3>Queue</h3>
+
+A buffer that stores messages until they are consumed by a consumer application or system. Queues have a name and can have one or more bindings to exchanges, which determine the messages that are received by the queue.
+
+Some common properties of a queue:
+
+ * <strong>Name</strong>: The name of the queue, which must be unique within the virtual host.
+ * <strong>Durability</strong>: Whether the queue is durable or transient. A durable queue persists even if the broker is restarted, while a transient queue is deleted when the broker is restarted.
+ * <strong>Exclusive</strong>: Whether the queue is exclusive to one connection or channel. Exclusive queues are only accessible to the connection that created them and are deleted when that connection is closed.
+ * <strong>Auto-delete</strong>: Whether the queue is automatically deleted when it is no longer in use.
+
+
+<h3>Bindings</h3>
+
+Bindings are relationships between a queue and an exchange that determine which messages are received by the queue. Bindings specify the routing criteria for messages to be forwarded to the queue, based on the exchange type and the message routing key.
+<br>
+
+When a message is sent to an exchange, the exchange routes the message to one or more queues based on the bindings of the queues. Each binding consists of a routing key and optional arguments that define how messages are filtered and routed to the queue.
+<br>
+
+The routing key is a message attribute that is matched against the routing criteria defined in the bindings of the exchange. The exchange uses the routing key to determine which queues should receive the message. For example, a direct exchange will forward messages to a queue if the routing key of the message matches the routing key of the queue's binding.
+
+
 <br><br>
 
 Exchanges
@@ -37,6 +64,7 @@ Exchanges
 In the AMQP, exchanges are the components responsible for routing messages to the appropriate queues based on specific routing rules or bindings.
 <br>
 When a producer sends a message to the exchange, the exchange receives the message and decides how to route it to the queues based on the type of exchange and the bindings that have been configured. The exchange then forwards the message to the appropriate queue(s) according to these rules.
+<br>
 
 
 <h3>Direct exchange</h3>
@@ -48,10 +76,52 @@ When a message is sent to a Direct exchange, the exchange looks at the routing k
 
 For example, if a message has a routing key of "customer.orders" and there is a queue bound to the exchange with a binding key of "customer.orders", the message will be routed to that queue. However, if there is no queue bound to the exchange with a matching binding key, the message will be discarded.
 
+![](https://github.com/AnastasKosstow/RabbitMQ/blob/main/assets/direct_exchange.png)
+<br><br>
 
 
+<h3>Fanout exchange</h3>
+
+A Fanout exchange in AMQP is a type of exchange that routes messages to all queues that are bound to it.
+<br>
+
+When a message is sent to a Fanout exchange, the exchange simply forwards a copy of the message to all the queues that are bound to it, regardless of the routing key of the message.
+<br>
+
+For example, if a Fanout exchange is bound to three queues, and a message is sent to the exchange, the message will be delivered to all three queues.
+<br>
+
+![](https://github.com/AnastasKosstow/RabbitMQ/blob/main/assets/fanout_exchange.png)
+<br><br>
 
 
+<h3>Topic exchange</h3>
+
+A Topic exchange in AMQP is a type of exchange that routes messages to one or more queues based on matching the routing key of the message against one or more topic bindings.
+<br>
+
+Topic bindings are defined using a pattern, which is a string that consists of one or more words, separated by dots. A routing key is also a string that can consist of one or more words, separated by dots. When a message is sent to a Topic exchange, the exchange compares the routing key of the message to the patterns of the topic bindings of all the queues that are bound to it. If the routing key matches the pattern of a binding, the message is routed to the corresponding queue.
+<br>
+
+For example, if a message has a routing key of "customer.orders.new" and there are two queues bound to the Topic exchange, one with a binding key of "customer.orders.#" and another with a binding key of "customer.#.new", the message will be delivered to both queues because it matches the patterns of both bindings.
+<br>
+
+![](https://github.com/AnastasKosstow/RabbitMQ/blob/main/assets/topic_exchange.png)
+<br><br>
+
+<h3>Header exchange</h3>
+
+A Headers exchange in AMQP is a type of exchange that routes messages based on header values instead of the routing key.
+<br>
+
+When a message is sent to a Headers exchange, the exchange looks at the headers of the message and compares them to the headers of the bindings of all the queues that are bound to it. If the header values of the message match the header values of a binding, the message is routed to the corresponding queue.
+<br>
+
+For example, if a message has a header of "color=blue" and there is a queue bound to the Headers exchange with a binding that specifies "x-match=all" and "color=blue", the message will be routed to that queue. However, if the message header does not match any of the bindings, the message will be discarded.
+<br>
+
+![](https://github.com/AnastasKosstow/RabbitMQ/blob/main/assets/headers_exchange.png)
+<br><br>
 
 
 

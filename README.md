@@ -32,6 +32,30 @@ In a RabbitMQ centralized architecture, applications or services that need to ex
 > * Topic Exchange: Messages are routed to queues based on a pattern match between the routing key of the message and the binding key of the queue.
 > * Headers Exchange: Messages are routed to queues based on headers attached to the message.
 
+
+<h3>Queue</h3>
+
+A buffer that stores messages until they are consumed by a consumer application or system. Queues have a name and can have one or more bindings to exchanges, which determine the messages that are received by the queue.
+
+Some common properties of a queue:
+
+ * <strong>Name</strong>: The name of the queue, which must be unique within the virtual host.
+ * <strong>Durability</strong>: Whether the queue is durable or transient. A durable queue persists even if the broker is restarted, while a transient queue is deleted when the broker is restarted.
+ * <strong>Exclusive</strong>: Whether the queue is exclusive to one connection or channel. Exclusive queues are only accessible to the connection that created them and are deleted when that connection is closed.
+ * <strong>Auto-delete</strong>: Whether the queue is automatically deleted when it is no longer in use.
+
+
+<h3>Bindings</h3>
+
+Bindings are relationships between a queue and an exchange that determine which messages are received by the queue. Bindings specify the routing criteria for messages to be forwarded to the queue, based on the exchange type and the message routing key.
+<br>
+
+When a message is sent to an exchange, the exchange routes the message to one or more queues based on the bindings of the queues. Each binding consists of a routing key and optional arguments that define how messages are filtered and routed to the queue.
+<br>
+
+The routing key is a message attribute that is matched against the routing criteria defined in the bindings of the exchange. The exchange uses the routing key to determine which queues should receive the message. For example, a direct exchange will forward messages to a queue if the routing key of the message matches the routing key of the queue's binding.
+
+
 <br><br>
 
 Exchanges

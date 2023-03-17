@@ -40,5 +40,7 @@ internal sealed class RabbitMqClient : IRabbitMqClient
         channel.ConfirmSelect();
         channel.BasicPublish(options.Exchange.Name, "rabbit_key", null, body.ToArray());
         channel.WaitForConfirmsOrDie();
+
+        Console.WriteLine("Send!");
     }
 }

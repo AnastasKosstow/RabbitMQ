@@ -9,22 +9,22 @@ namespace RabbitMQ.Consumer;
 
 public sealed class RabbitMQConsumerBackgroundService : BackgroundService
 {
-    private readonly IMessageConsumer _messageConsumer;
-    private readonly IEventDispatcher _eventDispatcher;
+    private readonly IMessageConsumer messageConsumer;
+    private readonly IEventDispatcher eventDispatcher;
 
     public RabbitMQConsumerBackgroundService(IMessageConsumer messageConsumer, IEventDispatcher eventDispatcher)
     {
-        _messageConsumer = messageConsumer;
-        _eventDispatcher = eventDispatcher;
+        this.messageConsumer = messageConsumer;
+        this.eventDispatcher = eventDispatcher;
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        _messageConsumer.Consume("rabbit", payload =>
+        messageConsumer.Consume("rabbit", payload =>
         {
             var message = Encoding.UTF8.GetString(payload);
             var @event = JsonSerializer.Deserialize<RabbitMqEvent>(message);
-            _eventDispatcher.DispatchAsync(@event, stoppingToken);
+            eventDispatcher.DispatchAsync(@event, cancellationToken);
         });
 
         return Task.CompletedTask;

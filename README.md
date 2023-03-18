@@ -12,6 +12,7 @@ Table of content
   * [Fanout exchange](#fanout-exchange)
   * [Topic exchange](#topic-exchange)
   * [Header exchange](#header-exchange)
+* [Configuration](#configuration)
 
 
 Introduction
@@ -124,6 +125,52 @@ For example, if a message has a header of "color=blue" and there is a queue boun
 <br><br>
 
 
+Configuration
+==========================
+
+The first step is to create a new instance of the `ConnectionFactory` class and configure it with the appropriate RabbitMQ connection settings, such as port number, virtual host name, username, and password.
+<br>
+
+After configuring the connection factory, you then create a connection to the RabbitMQ server using the `CreateConnection` method and passing in a list of hostnames to connect to. You then register the connection and a channel to the dependency injection container using the `services.AddSingleton` method, which allows you to inject these dependencies into other classes throughout your application.
+
+<br>
+
+> `IConnection` represents a connection to a RabbitMQ server. It allows you to create and manage channels.
+
+> `IModel` represents a channel to a RabbitMQ server. It allows you to perform operations such as declaring exchanges, queues, and bindings, as well as publishing and consuming messages.
+<br>
+
+
+```C#
+var connectionFactory = new ConnectionFactory
+{
+    Port = rabbitMqOptions.Port,
+    VirtualHost = rabbitMqOptions.VirtualHost,
+    UserName = rabbitMqOptions.Username,
+    Password = rabbitMqOptions.Password,
+    DispatchConsumersAsync = true,
+};
+
+services.AddSingleton(connectionFactory.CreateConnection(rabbitMqOptions.HostNames.ToList()));
+var connection = connectionFactory.CreateConnection();
+
+services.AddSingleton<IConnection>(connection);
+services.AddSingleton<IModel>(connection.CreateModel());
+```
+
+<h3>Producer</h3>
+
+
+
+
+
+<h3>Consumer</h3>
+
+
+
+
+
+
 
 
 
@@ -176,6 +223,3 @@ There is a lot components regarding to this protocol which makes it somehow comp
 
 * <h4>Push Model</h4>
 RMQ server pushes messages to consumers, Whenever there is a consumer send the message to it, in case of huge amount of message consumer could crash if it can not handle this number of messages.
-
-
-

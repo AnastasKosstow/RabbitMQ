@@ -160,7 +160,106 @@ services.AddSingleton<IModel>(connection.CreateModel());
 
 <h3>Producer</h3>
 
+In RabbitMQ, a producer is responsible for creating and sending messages to a specific exchange.
+To create a producer, use IModel interface to configure the channel:
+<br>
 
+```C#
+channel.ExchangeDeclare(
+    exchange: options.Exchange.Name,
+    type: options.Exchange.Type,
+    durable: options.Exchange.Durable,
+    autoDelete: options.Exchange.AutoDelete,
+    arguments: null);
+```
+This line declares a new exchange on the RabbitMQ server. 
+The parameters passed to this method specify 
+the name of the exchange, 
+its type (e.g. direct, topic, fanout), 
+whether it is durable (i.e. persists across server restarts), 
+whether it should be automatically deleted when no longer in use 
+and any additional arguments.
+
+<br>
+
+```C#
+channel.QueueDeclare(
+    queue: options.Queue.Name,
+    durable: options.Queue.Durable,
+    exclusive: options.Queue.Exclusive,
+    autoDelete: options.Queue.AutoDelete,
+    arguments: null);
+```
+This line declares a new queue on the RabbitMQ server. The parameters passed to this method specify 
+the name of the queue, 
+whether it is durable, 
+whether it is exclusive (i.e. can only be accessed by the connection that declared it), 
+whether it should be automatically deleted when no longer in use 
+and any additional arguments.
+
+
+> If the queue already exists when you call channel.QueueDeclare, RabbitMQ will not create a new queue. 
+> Instead, it will check if the existing queue has the same name and attributes as the one you are trying to declare. 
+> If they match, RabbitMQ will simply return the existing queue.
+
+<br>
+
+```C#
+channel.QueueBind(queue: options.Queue.Name, exchange: options.Exchange.Name, routingKey: "rabbit_key");
+```
+This allows messages published to the exchange with the specified routing key to be routed to the queue.
+
+<br>
+
+```C#
+string json = JsonSerializer.Serialize(message);
+ReadOnlySpan<byte> body = Encoding.UTF8.GetBytes(json);
+channel.BasicPublish(options.Exchange.Name, "rabbit_key", null, body.ToArray());
+```
+Publish the message to the exchange with the specified routing key.
+
+
+
+Full service:
+```C#
+internal sealed class RabbitMqPublisher : IRabbitMqPublisher
+{
+    private readonly RabbitMqOptions options;
+    private readonly IModel channel;
+
+    public RabbitMqPublisher(IModel channel, IOptions<RabbitMqOptions> options)
+    {
+        this.channel = channel;
+        this.options = options.Value;
+    }
+
+    public void Send(object message)
+    {
+        channel.ExchangeDeclare(
+            exchange: options.Exchange.Name,
+            type: options.Exchange.Type,
+            durable: options.Exchange.Durable,
+            autoDelete: options.Exchange.AutoDelete,
+            arguments: null);
+
+        channel.QueueDeclare(
+            queue: options.Queue.Name,
+            durable: options.Queue.Durable,
+            exclusive: options.Queue.Exclusive,
+            autoDelete: options.Queue.AutoDelete,
+            arguments: null);
+
+        channel.QueueBind(queue: options.Queue.Name, exchange: options.Exchange.Name, routingKey: "rabbit_key");
+
+        string json = JsonSerializer.Serialize(message);
+        ReadOnlySpan<byte> body = Encoding.UTF8.GetBytes(json);
+
+        channel.BasicPublish(options.Exchange.Name, "rabbit_key", null, body.ToArray());
+    }
+}
+```
+
+<br><br>
 
 
 

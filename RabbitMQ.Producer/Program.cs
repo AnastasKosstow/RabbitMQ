@@ -1,13 +1,17 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RabbitMQ.Producer.RabbitMQ;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using RabbitMQ.Common.Extensions;
 using RabbitMQ.Producer.Services;
 
 IServiceCollection services = new ServiceCollection();
 IServiceProvider serviceProvider = BuildServiceProvider(services);
 
-var client = serviceProvider.GetService<IPublisherService>();
-client.Publish(Guid.NewGuid());
+var clientFromConnection = serviceProvider.GetService<IRabbitMqPublisherWithConnection>();
+var clientFromConnectionPool = serviceProvider.GetService<IRabbitMqPublisherWithConnectionPool>();
+clientFromConnection.Publish(Guid.NewGuid(), "rabbit_routing_key");
+clientFromConnectionPool.Publish(Guid.NewGuid(), "rabbit_routing_key");
 
 Console.ReadKey();
 
@@ -19,16 +23,15 @@ static IServiceProvider BuildServiceProvider(IServiceCollection services)
         .Build();
 
     services.AddSingleton(configuration);
+    services.AddLogging(loggerBuilder =>
+    {
+        loggerBuilder.AddConsole();
+    });
 
-    services.AddOptions<RabbitMqOptions>()
-        .Configure<IConfiguration>((settings, _) =>
-        {
-            configuration.GetSection("rabbitMq").Bind(settings);
-        });
+    services.TryAddScoped<IRabbitMqPublisherWithConnection, RabbitMqPublisherWithConnection>();
+    services.TryAddScoped<IRabbitMqPublisherWithConnectionPool, RabbitMqPublisherWithConnectionPool>();
 
-    services
-        .AddScoped<IPublisherService, PublisherService>()
-        .AddRabbitMq(configuration);
-
-    return services.BuildServiceProvider();
+    return services
+        .AddRabbitMQ(configuration)
+        .BuildServiceProvider();
 }

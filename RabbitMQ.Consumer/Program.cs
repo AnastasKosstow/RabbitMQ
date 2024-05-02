@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using RabbitMQ.Common.Extensions;
 using RabbitMQ.Consumer;
-using RabbitMQ.Consumer.Dispatcher;
-using RabbitMQ.Consumer.Events.Abstractions;
-using RabbitMQ.Consumer.RabbitMQ;
-using RabbitMQ.Consumer.RabbitMQ.Consumer;
-using System.Reflection;
 
 var builder = new HostBuilder()
     .ConfigureAppConfiguration((hostingContext, config) =>
@@ -17,29 +14,14 @@ var builder = new HostBuilder()
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.Configure<RabbitMqOptions>(hostContext.Configuration.GetSection("rabbitmq"));
-        services.AddSingleton<IEventDispatcher, EventDispatcher>();
-        services.AddScoped<IMessageConsumer, RabbitMQMessageConsumer>();
+        services.AddLogging(loggerBuilder =>
+        {
+            loggerBuilder.AddConsole();
+        });
 
-        Assembly.GetExecutingAssembly()
-                .ExportedTypes
-                .Where(type =>
-                {
-                    var implementType = type
-                        .GetInterfaces()
-                        .Any(@interface => @interface.IsGenericType &&
-                                            @interface.GetGenericTypeDefinition() == typeof(IEventHandler<>));
-
-                    return implementType;
-                })
-                .ToList()
-                .ForEach(commandHandler =>
-                {
-                    services.AddScoped(commandHandler.GetInterface("IEventHandler`1"), commandHandler);
-                });
-
-        services.AddRabbitMq(hostContext.Configuration);
-        services.AddHostedService<RabbitMQConsumerBackgroundService>();
+        services
+            .AddRabbitMQ(hostContext.Configuration)
+            .AddHostedService<RabbitMQConsumerService>();
     });
 
 await builder.RunConsoleAsync();

@@ -26,6 +26,7 @@ In a centralized architecture, there is typically a single RabbitMQ server (or a
 In a RabbitMQ centralized architecture, applications or services that need to exchange messages connect to the central RabbitMQ server(s) and declare queues and exchanges. The server(s) then route messages between these queues and exchanges based on their routing keys and other properties.
 <br>
 
+> [!IMPORTANT]
 > AMQP (Advanced Message Queuing Protocol) is an open standard protocol for messaging middleware with following patterns:
 > * Direct Exchange: Messages are routed to queues based on a matching routing key.
 > * Fanout Exchange: Messages are broadcast to all queues that are bound to the exchange.

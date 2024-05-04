@@ -34,7 +34,7 @@ In a RabbitMQ centralized architecture, applications or services that need to ex
 > * Headers Exchange: Messages are routed to queues based on headers attached to the message.
 
 
-<h3>Queue</h3>
+### Queue
 
 A buffer that stores messages until they are consumed by a consumer application or system. Queues have a name and can have one or more bindings to exchanges, which determine the messages that are received by the queue.
 
@@ -46,8 +46,7 @@ Some common properties of a queue:
  * <strong>Auto-delete</strong>: Whether the queue is automatically deleted when it is no longer in use.
 
 
-<h3>Bindings</h3>
-
+### Bindings
 Bindings are relationships between a queue and an exchange that determine which messages are received by the queue. Bindings specify the routing criteria for messages to be forwarded to the queue, based on the exchange type and the message routing key.
 <br>
 
@@ -56,8 +55,7 @@ When a message is sent to an exchange, the exchange routes the message to one or
 
 The routing key is a message attribute that is matched against the routing criteria defined in the bindings of the exchange. The exchange uses the routing key to determine which queues should receive the message. For example, a direct exchange will forward messages to a queue if the routing key of the message matches the routing key of the queue's binding.
 
-
-<br><br>
+---
 
 Exchanges
 ==========================
@@ -68,7 +66,7 @@ When a producer sends a message to the exchange, the exchange receives the messa
 <br>
 
 
-<h3>Direct exchange</h3>
+### Direct exchange
 A Direct exchange in AMQP is a type of exchange that routes messages to a queue based on a direct match between the routing key of the message and the binding key of the queue.
 <br>
 
@@ -81,7 +79,7 @@ For example, if a message has a routing key of "customer.orders" and there is a 
 <br><br>
 
 
-<h3>Fanout exchange</h3>
+### Fanout exchange
 
 A Fanout exchange in AMQP is a type of exchange that routes messages to all queues that are bound to it.
 <br>
@@ -96,7 +94,7 @@ For example, if a Fanout exchange is bound to three queues, and a message is sen
 <br><br>
 
 
-<h3>Topic exchange</h3>
+### Topic exchange
 
 A Topic exchange in AMQP is a type of exchange that routes messages to one or more queues based on matching the routing key of the message against one or more topic bindings.
 <br>
@@ -110,7 +108,7 @@ For example, if a message has a routing key of "customer.orders.new" and there a
 ![](https://github.com/AnastasKosstow/RabbitMQ/blob/main/assets/topic_exchange.png)
 <br><br>
 
-<h3>Header exchange</h3>
+### Header exchange
 
 A Headers exchange in AMQP is a type of exchange that routes messages based on header values instead of the routing key.
 <br>
@@ -122,5 +120,33 @@ For example, if a message has a header of "color=blue" and there is a queue boun
 <br>
 
 ![](https://github.com/AnastasKosstow/RabbitMQ/blob/main/assets/headers_exchange.png)
-<br><br>
+<br>
+
+---
+
+## Producer 
+A producer is responsible for sending messages to exchanges. <br>
+The `RabbitMqPublisherWithConnection` class implements a producer that can publish messages to a RabbitMQ.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
